@@ -10,6 +10,8 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import Table from "components/Table/Table.js";
+
 
 const styles = {
   cardCategoryWhite: {
@@ -33,13 +35,29 @@ import axios from "http/axios";
 import {useState} from "react";
 const useStyles = makeStyles(styles);
 
+
+function process_it(mydata){
+  console.log(mydata)
+  let desired = [];
+  for (let d in mydata){
+      let data = mydata[d];
+      desired.push([data.id,data.name,data.role_level]);
+  }
+  console.log(desired)
+  return desired;
+}
+
 export default function UserProfile() {
   
   const [data, setdata] = useState({});
-  const [resources, setresources] = useState({});
+  const [resources, setresources] = useState([]);
+  const [vaccancy, setvaccancy] = useState({})
   const handleSubmit =async ()=>{
+        console.log(`data is ${data}`)
         let result=await axios.post("/core/allocate_resources/",data);
-        setresources(result.data)
+        console.log(result)
+        setresources(result.data.resources)
+        setvaccancy(result.data.is_vaccancy)
   }
   const classes = useStyles();
   return (
@@ -125,6 +143,20 @@ export default function UserProfile() {
             </CardFooter>
           </Card>
         </GridItem>
+        <GridItem xs={8} sm={12} md={12}>
+        <Card>
+          <CardHeader color="primary">
+            <h4 className={classes.cardTitleWhite}>Allocated Resources</h4>
+          </CardHeader>
+          <CardBody>
+            <Table
+              tableHeaderColor="primary"
+              tableHead={["ID", "Resource Name","Role Level"]}
+              tableData={process_it(resources)}
+            />
+          </CardBody>
+        </Card>
+      </GridItem>
       </GridContainer>
     </div>
   );
