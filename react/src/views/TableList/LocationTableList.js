@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
@@ -8,6 +8,14 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import axios from "../../http/axios"
+import InputLabel from '@material-ui/core/InputLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import NativeSelect from '@material-ui/core/NativeSelect';
+import { SettingsInputComponent } from "@material-ui/icons";
+
 
 const styles = {
   cardCategoryWhite: {
@@ -41,62 +49,120 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
+function process_it(mydata){
+  console.log(mydata)
+  let desired = [];
+  for (let d in mydata){
+      let data = mydata[d];
+      desired.push([data.id, data.name, data.role, data.role_level, data.gender]);
+  }
+  console.log(desired)
+  return desired;
+}
+
+function process_it2(mydata){
+  console.log(mydata)
+  let desired = [];
+  for (let d in mydata){
+      let data = mydata[d];
+      desired.push([data.id, data.name, data.start_date, data.gender]);
+  }
+  console.log(desired)
+  return desired;
+}
+
+
+
 export default function TableList() {
   const classes = useStyles();
+  const [state, setState] = React.useState({
+    location:'AZ'
+  });
+  const [eng,seteng] = useState({
+    engineer:[]
+  })
+  const [ux,setux] = useState({
+    ux:[]
+  })
+  const [pm,setpm] = useState({
+    pm:[]
+  })
+
+  const handleChange = async (event) => {
+    const name = event.target.name;
+    setState({
+      ...state,
+      [name]: event.target.value,
+    });
+    console.log("Here we are")
+    const data = await axios.get(`/core/location_resources?location=${event.target.value}`)
+    console.log(data)
+    seteng((prev)=>({
+      ...prev,
+      engineer:data.data.Engr
+    }))
+    setpm((prev)=>({
+      ...prev,
+      pm:data.data.pms
+    }))
+    setux((prev)=>({
+      ...prev,
+      ux:data.data.uxs
+    }))
+  };
+  console.log(eng,pm,ux)
+
+  useEffect(() => {
+    (async () => {
+      const data = await axios.get(`/core/location_resources?location=AZ`)
+      console.log(data)
+      seteng((prev)=>({
+        ...prev,
+        engineer:data.data.Engr
+      }))
+      setpm((prev)=>({
+        ...prev,
+        pm:data.data.pms
+      }))
+      setux((prev)=>({
+        ...prev,
+        ux:data.data.uxs
+      }))
+    })()
+  }, [])
+
+  
+
   return (
     <GridContainer>
-      <GridItem xs={12} sm={12} md={12}>
-        <Card plain>
-          <CardHeader plain color="primary">
-            <h4 className={classes.cardTitleWhite}>List of Engineers</h4>
-            <p className={classes.cardCategoryWhite}>Location - AZ</p>
-          </CardHeader>
-          <CardBody>
-            <Table
-              tableHeaderColor="primary"
-              tableHead={["ID", "Resource", "Role", "Product", "Gender"]}
-              tableData={[
-                ["1", "Dakota Rice", "$36,738", "Niger", "Oud-Turnhout"],
-                ["2", "Minerva Hooper", "$23,789", "Curaçao", "Sinaai-Waas"],
-                ["3", "Sage Rodriguez", "$56,142", "Netherlands", "Baileux"],
-                [
-                  "4",
-                  "Philip Chaney",
-                  "$38,735",
-                  "Korea, South",
-                  "Overland Park",
-                ],
-                [
-                  "5",
-                  "Doris Greene",
-                  "$63,542",
-                  "Malawi",
-                  "Feldkirchen in Kärnten",
-                ],
-                ["6", "Mason Porter", "$78,615", "Chile", "Gloucester"],
-              ]}
-            />
-          </CardBody>
-        </Card>
-      </GridItem>
+      <FormControl className={classes.formControl}>
+        <InputLabel htmlFor="location-id">Location</InputLabel>
+        <Select
+          native
+          value={state.location}
+          onChange={handleChange}
+          inputProps={{
+            name: 'location',
+            'id': 'location-id'
+          }}
+        >
+          <option aria-label="None" value="" />
+          <option value={"AZ"}>AZ</option>
+          <option value={"IL"}>IL</option>
+          <option value={"TX"}>TX</option>
+        </Select>
+      </FormControl>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
             <h4 className={classes.cardTitleWhite}>List of Product Managers</h4>
-            <p className={classes.cardCategoryWhite}>Location - AZ</p>
+            <p className={classes.cardCategoryWhite}>Location - {state.location}</p>
           </CardHeader>
           <CardBody>
             <Table
               tableHeaderColor="primary"
-              tableHead={["ID", "Resource", "Product", "Gender"]}
-              tableData={[
-                ["Dakota Rice", "Niger", "Oud-Turnhout", "$36,738"],
-                ["Minerva Hooper", "Curaçao", "Sinaai-Waas", "$23,789"],
-                ["Sage Rodriguez", "Netherlands", "Baileux", "$56,142"],
-                ["Philip Chaney", "Korea, South", "Overland Park", "$38,735"],
-                ["Doris Greene", "Malawi", "Feldkirchen in Kärnten", "$63,542"],
-                ["Mason Porter", "Chile", "Gloucester", "$78,615"],
-              ]}
+              tableHead={["ID", "Resource", "Start Date", "Gender"]}
+              tableData={process_it2(pm.pm)}
             />
           </CardBody>
         </Card>
@@ -105,20 +171,28 @@ export default function TableList() {
         <Card>
           <CardHeader color="primary">
             <h4 className={classes.cardTitleWhite}>List of UX Designers</h4>
-            <p className={classes.cardCategoryWhite}>Location - AZ</p>
+            <p className={classes.cardCategoryWhite}>Location - {state.location}</p>
           </CardHeader>
           <CardBody>
             <Table
               tableHeaderColor="primary"
-              tableHead={["ID", "Resource", "Product", "Gender"]}
-              tableData={[
-                ["Dakota Rice", "Niger", "Oud-Turnhout", "$36,738"],
-                ["Minerva Hooper", "Curaçao", "Sinaai-Waas", "$23,789"],
-                ["Sage Rodriguez", "Netherlands", "Baileux", "$56,142"],
-                ["Philip Chaney", "Korea, South", "Overland Park", "$38,735"],
-                ["Doris Greene", "Malawi", "Feldkirchen in Kärnten", "$63,542"],
-                ["Mason Porter", "Chile", "Gloucester", "$78,615"],
-              ]}
+              tableHead={["ID", "Resource", "Start Date", "Gender"]}
+              tableData={process_it2(ux.ux)}
+            />
+          </CardBody>
+        </Card>
+      </GridItem>
+      <GridItem xs={12} sm={12} md={12}>
+        <Card plain>
+          <CardHeader plain color="primary">
+            <h4 className={classes.cardTitleWhite}>List of Engineers</h4>
+            <p className={classes.cardCategoryWhite}>Location - {state.location}</p>
+          </CardHeader>
+          <CardBody>
+            <Table
+              tableHeaderColor="primary"
+              tableHead={["ID", "Resource", "Role", "Product", "Gender"]}
+              tableData={process_it(eng.engineer)}
             />
           </CardBody>
         </Card>
@@ -126,3 +200,5 @@ export default function TableList() {
     </GridContainer>
   );
 }
+
+

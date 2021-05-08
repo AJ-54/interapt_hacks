@@ -19,6 +19,8 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import {useEffect,useState} from "react";
+
 
 import { bugs, website, server } from "variables/general.js";
 

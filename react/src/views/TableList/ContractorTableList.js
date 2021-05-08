@@ -1,4 +1,4 @@
-import React from "react";
+import {React,useEffect,useState} from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
 // core components
@@ -8,6 +8,7 @@ import Table from "components/Table/Table.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import axios from "../../http/axios"
 
 const styles = {
   cardCategoryWhite: {
@@ -39,10 +40,54 @@ const styles = {
   },
 };
 
+function process_it(mydata){
+  console.log(mydata)
+  let desired = [];
+  for (let d in mydata){
+      let data = mydata[d];
+      desired.push([data.location,data.total]);
+  }
+  console.log(desired)
+  return desired;
+}
+
+function process_it2(mydata){
+  console.log(mydata)
+  let desired = [];
+  for (let d in mydata){
+      let data = mydata[d];
+      desired.push([data.vendor.name,data.total]);
+  }
+  console.log(desired)
+  return desired;
+}
+
 const useStyles = makeStyles(styles);
 
 export default function TableList() {
   const classes = useStyles();
+  const [vendor,setvendor] = useState({
+    vendor:[]
+  })
+  const [location,setlocation] = useState({
+    location:[]
+  })
+  useEffect(() => {
+    (async () => {
+      const data = await axios.get(`/core/contractor_count`)
+      console.log(data.data)
+      setvendor((prev)=>({
+        ...prev,
+        vendor:data.data.Vendor
+      }))
+      setlocation((prev)=>({
+        ...prev,
+        location:data.data.location_wise
+      }))
+    })()
+  }, [])  
+  console.log(vendor)
+  console.log(location)
   return (
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
@@ -54,14 +99,7 @@ export default function TableList() {
             <Table
               tableHeaderColor="primary"
               tableHead={["Name", "Count"]}
-              tableData={[
-                ["Dakota Rice", 20],
-                ["Minerva Hooper", 30],
-                ["Sage Rodriguez", 50],
-                ["Philip Chaney", 70],
-                ["Doris Greene", 90],
-                ["Mason Porter", 110],
-              ]}
+              tableData={process_it(location.location)}
             />
           </CardBody>
         </Card>
@@ -75,14 +113,7 @@ export default function TableList() {
             <Table
               tableHeaderColor="primary"
               tableHead={["Name", "Count"]}
-              tableData={[
-                ["Dakota Rice", 20],
-                ["Minerva Hooper", 30],
-                ["Sage Rodriguez", 50],
-                ["Philip Chaney", 70],
-                ["Doris Greene", 90],
-                ["Mason Porter", 110],
-              ]}
+              tableData={process_it2(vendor.vendor)}
             />
           </CardBody>
         </Card>
