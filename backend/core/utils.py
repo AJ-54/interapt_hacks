@@ -1,5 +1,6 @@
 from datetime import datetime, time, timedelta
-
+from .models import *
+from django.db.models import Q
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
@@ -29,8 +30,8 @@ def allocate_resources(product):
     }
 
     if product.end_date is not None :
-        for k,v in product.requirements:
-            available_resouces=Resource.objects.filter(role_level=k).exclude(
+        for k,v in product.requirements.items():
+            available_resources=Resource.objects.filter(role_level=k).exclude(
                 Q(products_through__start_date__range=[product.start_date,product.end_date])|
                 Q(products_through__end_date__range=[product.start_date,product.end_date])|
                 Q(products_through__end_date__gte=product.end_date,products_through__start_date__lte=product.start_date)
@@ -40,28 +41,30 @@ def allocate_resources(product):
                 products_through__end_date=None,
             )
 
-            can_take=min(product.requirements[k],avaialable_resources.count())
+            can_take=min(product.requirements[k],available_resources.count())
+            print(can_take)
             diff=can_take-product.requirements[k]
             if diff<0 :
                 is_vacancy[k]=True
             for i in range(can_take):
-                product.resources.add(avaialable_resources[i])
+                print("i",i)
+                product.resources.add(available_resources[i])
     else :
-        for k,v in product.requirements:
-            available_resouces==Resource.objects.filter(role_level=k).exclude(
+        for k,v in product.requirements.items():
+            available_resources=Resource.objects.filter(role_level=k).exclude(
                 products_through__end_date__gte=product.start_date
             ).exclude(
                 products_through__end_date=None,
-                products__product__end_date__range__gte=product.start_date
+                products_through__product__end_date__gte=product.start_date
             ).exclude(
                 products__end_date=None
             )
 
-            can_take=min(product.requirements[k],avaialable_resources.count())
+            can_take=min(product.requirements[k],available_resources.count())
             diff=can_take-product.requirements[k]
             if diff<0 :
                 is_vacancy[k]=True
             for i in range(can_take):
-                product.resources.add(avaialable_resources[i])
+                product.resources.add(available_resources[i])
 
     product.save()

@@ -42,7 +42,8 @@ class DiversityView(APIView):
                 "colored":Resource.objects.filter(is_color=True).count(),
                 "not_colored":Resource.objects.filter(is_color=False).count(),
                 "male":Resource.objects.filter(gender="M").count(),
-                "female":Resource.objects.filter(gender="F").count()
+                "female":Resource.objects.filter(gender="F").count(),
+                "other":Resource.objects.filter(gender="O").count()
             }
             
         }
@@ -190,17 +191,21 @@ class DashboardData(APIView):
         return Response(data,status=status.HTTP_200_OK)
 
 
-class ResourceSkills(generics.GenericAPIView):
+class ResourceSkills(generics.RetrieveAPIView):
+    renderer_classes=(JSONRenderer,)
     queryset=Resource.objects.all()
     serializer_class=ResourceSerializer
-    
+
+class GetResources(generics.ListAPIView):
+    queryset=Resource.objects.all()
+    serializer_class=ResourceSerializer
 
 class NextRotationResources(generics.ListAPIView):
     serializer_class= ProductResourceSerializer
     renderer_classes=(JSONRenderer,)
 
     def get_queryset(self):
-        return ProductResourceInfo.objects.exclude(end_date__lte=datetime.now().date()).annotate(days=ExpressionWrapper(datetime.now().date() - F("start_date"),output_field=fields.DurationField())).order_by("-days")
+        return ProductResourceInfo.objects.exclude(end_date__lte=datetime.now().date()).annotate(days=ExpressionWrapper(datetime.now().date() - F("start_date"),output_field=fields.DurationField())).order_by("-days")[:5]
 
 class AllocateResources(generics.CreateAPIView):
     serializer_class=ProductSerializer

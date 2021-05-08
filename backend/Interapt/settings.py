@@ -39,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+     'corsheaders',
     "core",
     "rest_framework",
     "django_filters",
-    'corsheaders',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -158,3 +158,19 @@ REST_FRAMEWORK = {
 }
 
 
+REST_FRAMEWORK = {
+    'UPLOADED_FILES_USE_URL': True,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.FileUploadParser',
+        'rest_framework.parsers.FormParser',
+    ],
+    "TIME_FORMAT": "%I:%M %p",
+    "TIME_INPUT_FORMATS": ["%I:%M %p", "%H:%M"],
+}
+CORS_ORIGIN_ALLOW=True

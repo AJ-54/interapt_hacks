@@ -18,7 +18,7 @@ class ResourceSerializer(ModelSerializer):
     vendor = VendorSerializer()
     class Meta:
         model = Resource
-        fields = ['id','skills','vendor','start_date','location','is_color','gender','role','role_level','is_employee']
+        fields = ['id','skills','vendor','start_date','location','is_color','gender','role','role_level','is_employee',"name"]
 
 class ProductSerializer(ModelSerializer):
     resources = ResourceSerializer(many=True,required=False)
