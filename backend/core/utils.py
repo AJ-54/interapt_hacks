@@ -22,7 +22,7 @@ def send_mail(subject_template_name, email_template_name, context, from_email, t
 
     email_message.send()
 
-def allocate_resources(product):
+def allocate_resources(product,is_vacancy):
     is_vacancy={
         "Senior":False,
         "Junior":False,

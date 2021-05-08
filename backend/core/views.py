@@ -217,9 +217,13 @@ class AllocateResources(generics.CreateAPIView):
         print(serializer)
         if serializer.is_valid():
             instance =serializer.save()
-            allocate_resources(instance)
+            is_vaccancy={}
+            allocate_resources(instance,is_vaccancy)
             data=ProductSerializer(instance,context={"request":request}).data
-            return Response(data,status=status.HTTP_200_OK)
+            return Response({
+                "resources":data.resoucers,
+                "is_vaccancy":is_vaccancy
+            },status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
