@@ -77,12 +77,12 @@ const Maps = () => {
       position: myLatlng,
       map: map,
       animation: google.maps.Animation.DROP,
-      title: "Material Dashboard React!",
+      title: "Shannon Enterprise",
     });
 
     const contentString =
-      '<div class="info-window-content"><h2>Material Dashboard React</h2>' +
-      "<p>A premium Admin for React, Material-UI, and React Hooks.</p></div>";
+      '<div class="info-window-content"><h2>Shannon Enterprise</h2>' +
+      "<p>We create apps to drive business performance and provide custom training to solve the tech talent gap.</p></div>";
 
     const infowindow = new google.maps.InfoWindow({
       content: contentString,

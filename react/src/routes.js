@@ -1,20 +1,3 @@
-/*!
-
-=========================================================
-* Material Dashboard React - v1.10.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/material-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 // @material-ui/icons
 import Dashboard from "@material-ui/icons/Dashboard";
 import Person from "@material-ui/icons/Person";
@@ -32,7 +15,6 @@ const dashboardRoutes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    rtlName: "لوحة القيادة",
     icon: Dashboard,
     component: DashboardPage,
     layout: "/admin",
@@ -40,7 +22,6 @@ const dashboardRoutes = [
   {
     path: "/user",
     name: "Resource Allocation",
-    rtlName: "ملف تعريفي للمستخدم",
     icon: Person,
     component: UserProfile,
     layout: "/admin",
@@ -48,7 +29,6 @@ const dashboardRoutes = [
   {
     path: "/location-wise",
     name: "Location Wise",
-    rtlName: "قائمة الجدول",
     icon: "content_paste",
     component: LocationTableList,
     layout: "/admin",
@@ -56,7 +36,6 @@ const dashboardRoutes = [
   {
     path: "/contractors",
     name: "Contractors",
-    rtlName: "قائمة الجدول",
     icon: "content_paste",
     component: ContractorTableList,
     layout: "/admin",
@@ -64,7 +43,6 @@ const dashboardRoutes = [
   {
     path: "/resource",
     name: "Resource",
-    rtlName: "قائمة الجدول",
     icon: "content_paste",
     component: ResourceTableList,
     layout: "/admin",
@@ -72,7 +50,6 @@ const dashboardRoutes = [
   {
     path: "/maps",
     name: "Maps",
-    rtlName: "خرائط",
     icon: LocationOn,
     component: Maps,
     layout: "/admin",
