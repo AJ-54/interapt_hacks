@@ -10,7 +10,8 @@ from django.http import Http404
 from rest_framework.renderers import JSONRenderer
 from datetime import datetime
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q
+from django.db.models import Q,Count,F,ExpressionWrapper, fields
+from django.db.models.functions import ExtractDay
 import pandas as pd
 from datetime import datetime
 from django.conf import settings
@@ -48,6 +49,22 @@ class DiversityView(APIView):
 
         return Response(data,status=status.HTTP_200_OK)
 
+
+class ContractorView(APIView):
+    renderer_classes=(JSONRenderer,)
+    def get(self,request,*args,**kwargs):
+        vendor_data = Resource.objects.exclude(vendor=None).values('vendor').annotate(total=Count('vendor')).order_by('total')
+        location_data = Resource.objects.exclude(vendor=None).values('location').annotate(total=Count('location')).order_by('total')
+        
+        data={
+            "Vendor": ContractorSerializer(vendor_data, many=True).data,
+            "location_wise": LocationSerializer(location_data, many=True).data,
+            
+        }
+
+        return Response(data,status=status.HTTP_200_OK)
+
+
 class ProductResourcesView(generics.GenericAPIView):
     serializer_class=ProductResourceInfoSerializer
     renderer_classes=(JSONRenderer,)
@@ -56,13 +73,14 @@ class ProductResourcesView(generics.GenericAPIView):
         return get_object_or_404(Product,pk=int(self.kwargs["product_id"]))
     
     def get_data(self,role):
-        return self.object.resources_through.filter(resource__role=role)
+        object = self.get_object()
+        return object.resources_through.filter(resource__role=role)
     
     def get(self,request,*args,**kwargs):
         data={
-            "pms":self.serializer_class(self.get_data("PM"),many=True,context=self.get_serializer_context(**kwargs)).data,
-            "uxs":self.serializer_class(self.get_data("UX"),many=True,context=self.get_serializer_context(**kwargs)).data,
-            "Engr":self.serializer_class(self.get_data("Engr"),many=True,context=self.get_serializer_context(**kwargs)).data
+            "pms":self.serializer_class(self.get_data("PM"),many=True).data,
+            "uxs":self.serializer_class(self.get_data("UX"),many=True).data,
+            "Engr":self.serializer_class(self.get_data("Engr"),many=True).data
         }
         return Response(data,status=status.HTTP_200_OK)
 
@@ -71,18 +89,18 @@ class LocationResourcesView(generics.GenericAPIView):
     serializer_class=ResourceSerializer
     renderer_classes=(JSONRenderer,)
     
-    def get_data(self,baseresources,role):
+    def get_data(self,baseresources,role, location):
 
         return baseresources.filter(role=role,location=location)    
 
     def get(self,request,*args,**kwargs):
-        location=self.request.query_params("location")
+        location=self.request.query_params.get("location")
         if location is not None:
             base_resources = Resource.objects.filter(location=location)
             data={
-                "pms":self.serializer_class(self.get_data(base_resources,"PM"),many=True,context=self.get_serializer_context(**kwargs)).data,
-                "uxs":self.serializer_class(self.get_data(base_resources,"UX"),many=True,context=self.get_serializer_context(**kwargs)).data,
-                "Engr":self.serializer_class(self.get_data(base_resources,"Engr"),many=True,context=self.get_serializer_context(**kwargs)).data
+                "pms":self.serializer_class(self.get_data(base_resources,"PM",location),many=True,context=self.get_serializer_context(**kwargs)).data,
+                "uxs":self.serializer_class(self.get_data(base_resources,"UX",location),many=True,context=self.get_serializer_context(**kwargs)).data,
+                "Engr":self.serializer_class(self.get_data(base_resources,"Engr",location),many=True,context=self.get_serializer_context(**kwargs)).data
             }
             return Response(data,status=status.HTTP_200_OK)
         else :
@@ -98,18 +116,22 @@ class GetProductResourcePositionsView(generics.GenericAPIView):
         return get_object_or_404(Product,pk=int(self.kwargs["product_id"]))
     
     def get_product_resources(self):
-        return self.object.resources_through.all()
+        object = self.get_object()
+        return object.resources_through.all()
     
     def get(self,request,*args,**kwargs):
         resources=self.get_product_resources()
         data={}
-        for k,v in request.query_params:
+        for k,v in request.query_params.items():
+            print(k)
+            print(v)
+            print('---')
             if k in ["PM","UX","Engr"]:
-                data[k]=self.serializer_class(resources.filter(resource__role=k),many=True,context=self.get_context_data(**kwargs)).data
+                data[k]=self.serializer_class(resources.filter(resource__role=k),many=True).data
             else :
                 check={}
                 check[k]=1
-                data[k]==self.serializer_class(resources.filter(positions__contains=check),many=True,context=self.get_context_data(**kwargs)).data
+                data[k]==self.serializer_class(resources.filter(positions__contains=check),many=True).data
 
         return Response(data,status=status.HTTP_200_OK)
 
@@ -151,7 +173,7 @@ class ContractorResources(generics.ListAPIView):
     renderer_classes=(JSONRenderer,)
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['vendor', 'location']
-
+    serializer_class = ResourceSerializer
     def get_queryset(self):
         return Resource.objects.exclude(vendor=None)
 
@@ -159,10 +181,11 @@ class ContractorResources(generics.ListAPIView):
 class DashboardData(APIView):
     renderer_classes=(JSONRenderer,)
     def get(self,request,*args,**kwargs):
-        data["active_projects"]=Product.objects.filter(start_date__lte=datetime.now().date(),end_date__gte=datetime.now().date()).count()
-        data["completed_project"]=Product.objects.filter(end_date__lt=datetime.now().date()).count()
+        data = {}
+        data["active_products"]=Product.objects.filter(start_date__lte=datetime.now().date(),end_date__gte=datetime.now().date()).count()
+        data["completed_products"]=Product.objects.filter(end_date__lt=datetime.now().date()).count()
         data["contractors"]=Vendor.objects.count()
-        data["employees"]=Resource.objects.filter(vendor=None).count()
+        data["resources"]=Resource.objects.filter(vendor=None).count()
 
         return Response(data,status=status.HTTP_200_OK)
 
@@ -173,26 +196,26 @@ class ResourceSkills(generics.GenericAPIView):
     
 
 class NextRotationResources(generics.ListAPIView):
-    serializer_class=ResourceSerializer
+    serializer_class= ProductResourceSerializer
     renderer_classes=(JSONRenderer,)
 
     def get_queryset(self):
-        return Resource.objects.all().order_by("-current_end_date")
-
-
+        return ProductResourceInfo.objects.exclude(end_date__lte=datetime.now().date()).annotate(days=ExpressionWrapper(datetime.now().date() - F("start_date"),output_field=fields.DurationField())).order_by("-days")
 
 class AllocateResources(generics.CreateAPIView):
     serializer_class=ProductSerializer
     renderer_classes=(JSONRenderer,)
 
     def create(self,request,*args,**kwargs):
-        serializer=self.serializer_class(request.data,context={"request":request})
+        print(request.data)
+        serializer=self.serializer_class(data = request.data,context={"request":request})
+        print(serializer)
         if serializer.is_valid():
             instance =serializer.save()
             allocate_resources(instance)
             data=ProductSerializer(instance,context={"request":request}).data
             return Response(data,status=status.HTTP_200_OK)
-        return Response(serializer.errors,status=HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
 # Data filling scripts
