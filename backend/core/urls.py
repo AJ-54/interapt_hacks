@@ -13,5 +13,5 @@ urlpatterns = [
     # path('dashboard_data/',DashboardData.as_view(),name='dashboard_data'),
     # path('next_rotation_resources/',NextRotationResources.as_view(),name='next_rotation_resources'),
     # path('allocate_resources/',AllocateResources.as_view(),name='allocate_resources'),
-    path('test/',ResourceFilling,name='rf')
+    path('test/',ProductFilling,name='rf')
 ]

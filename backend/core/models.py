@@ -19,6 +19,8 @@ class Skill(models.Model):
 class Vendor(models.Model):
     name:str=models.CharField(max_length=255)
     description:Optional[str]=models.TextField(blank=True,null=True)
+    def __str__(self):
+        return self.name
     
 class Resource(models.Model):
     class GenderChoices(models.TextChoices):
@@ -32,14 +34,14 @@ class Resource(models.Model):
         Engr="Engr"
 
     class RoleLevelChoices(models.TextChoices):
-        Senior="S"
-        Mid="M"
-        Junior="J"
+        Senior="Senior"
+        Mid="Mid"
+        Junior="Junior"
 
+    name = models.CharField(max_length=200,null=True)
     skills=models.ManyToManyField(Skill,related_name="resources")
     vendor=models.ForeignKey(Vendor,related_name="resources",on_delete=models.CASCADE,null=True)
     start_date:datetime.date=models.DateField()
-    current_end_date:datetime.date=models.DateField()
     location=models.CharField(max_length=100,choices=LocationChoices.choices,default="")
     is_color=models.BooleanField(blank=True,null=True)
     gender=models.CharField(choices=GenderChoices.choices,max_length=200)
@@ -49,18 +51,20 @@ class Resource(models.Model):
 
     def save(self,*args,**kwargs):
         if not self.id:
-            self.current_end_date=self.start_date
             if self.vendor is not None:
                 self.is_employee=False
         return super(Resource,self).save(*args,**kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 
 def get_default_requirements():
     return {
-        "S":0,
-        "M":0,
-        "J":0
+        "Senior":0,
+        "Mid":0,
+        "Junior":0
     }
 
 def get_default_positions():
@@ -82,6 +86,9 @@ class Product(models.Model):
     location=models.CharField(max_length=100,choices=LocationChoices.choices,default="")
     resources=models.ManyToManyField(Resource,related_name="products",through="core.ProductResourceInfo")
     requirements=models.JSONField(default=get_default_requirements)
+
+    def __str__(self):
+        return self.product_title
 
 class ProductResourceInfo(models.Model):
     product=models.ForeignKey(Product,related_name="resources_through",on_delete=models.CASCADE)

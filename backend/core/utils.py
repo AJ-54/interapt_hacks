@@ -20,3 +20,48 @@ def send_mail(subject_template_name, email_template_name, context, from_email, t
         email_message.attach_alternative(html_email, 'text/html')
 
     email_message.send()
+
+def allocate_resources(product):
+    is_vacancy={
+        "Senior":False,
+        "Junior":False,
+        "Mid":False
+    }
+
+    if product.end_date is not None :
+        for k,v in product.requirements:
+            available_resouces=Resource.objects.filter(role_level=k).exclude(
+                Q(products_through__start_date__range=[product.start_date,product.end_date])|
+                Q(products_through__end_date__range=[product.start_date,product.end_date])|
+                Q(products_through__end_date__gte=product.end_date,products_through__start_date__lte=product.start_date)
+            ).exclude(
+                Q(products_through__product__end_date__range=[product.start_date,product.end_date])|
+                Q(products_through__product__end_date__gte=product.end_date,products_through__start_date__lte=product.start_date),
+                products_through__end_date=None,
+            )
+
+            can_take=min(product.requirements[k],avaialable_resources.count())
+            diff=can_take-product.requirements[k]
+            if diff<0 :
+                is_vacancy[k]=True
+            for i in range(can_take):
+                product.resources.add(avaialable_resources[i])
+    else :
+        for k,v in product.requirements:
+            available_resouces==Resource.objects.filter(role_level=k).exclude(
+                products_through__end_date__gte=product.start_date
+            ).exclude(
+                products_through__end_date=None,
+                products__product__end_date__range__gte=product.start_date
+            ).exclude(
+                products__end_date=None
+            )
+
+            can_take=min(product.requirements[k],avaialable_resources.count())
+            diff=can_take-product.requirements[k]
+            if diff<0 :
+                is_vacancy[k]=True
+            for i in range(can_take):
+                product.resources.add(avaialable_resources[i])
+
+    product.save()
