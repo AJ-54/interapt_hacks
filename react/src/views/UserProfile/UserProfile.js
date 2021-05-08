@@ -29,10 +29,18 @@ const styles = {
     textDecoration: "none",
   },
 };
-
+import axios from "http/axios";
+import {useState} from "react";
 const useStyles = makeStyles(styles);
 
 export default function UserProfile() {
+  
+  const [data, setdata] = useState({});
+  const [resources, setresources] = useState({});
+  const handleSubmit =async ()=>{
+        let result=await axios.post("/core/allocate_resources/",data);
+        setresources(result.data)
+  }
   const classes = useStyles();
   return (
     <div>
@@ -54,6 +62,7 @@ export default function UserProfile() {
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e)=>setdata(prev=>({...prev,requirements:{...prev.requirements,Senior:e.target.value}}))}
                   />
                 </GridItem>
                 <GridItem xs={12} sm={12} md={3}>
@@ -63,6 +72,7 @@ export default function UserProfile() {
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e)=>setdata(prev=>({...prev,requirements:{...prev.requirements,Junior:e.target.value}}))}
                   />
                 </GridItem>
                 <GridItem xs={12} sm={12} md={4}>
@@ -72,13 +82,14 @@ export default function UserProfile() {
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e)=>setdata(prev=>({...prev,requirements:{...prev.requirements,Mid:e.target.value}}))}
                   />
                 </GridItem>
               </GridContainer>
               <GridContainer>
                 <GridItem xs={12} sm={12} md={6}>
                   <CustomInput
-                    labelText="Start Date (mm-dd-yyyy)"
+                    labelText="Start Date (yyyy-dd-mm)"
                     id="start"
                     formControlProps={{
                       fullWidth: true,
@@ -87,11 +98,12 @@ export default function UserProfile() {
                 </GridItem>
                 <GridItem xs={12} sm={12} md={6}>
                   <CustomInput
-                    labelText="End Date (mm-dd-yyyy)"
+                    labelText="End Date (yyyy-dd-mm)"
                     id="last"
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e)=>setdata(prev=>({...prev,end_date:e.target.value}))}
                   />
                 </GridItem>
               </GridContainer>
@@ -103,12 +115,13 @@ export default function UserProfile() {
                     formControlProps={{
                       fullWidth: true,
                     }}
+                    onChange={(e)=>setdata(prev=>({...prev,start_date:e.target.value}))}
                   />
                 </GridItem>
               </GridContainer>
             </CardBody>
             <CardFooter>
-              <Button color="primary">Allocate Resources</Button>
+              <Button color="primary" onClick={handleSubmit}>Allocate Resources</Button>
             </CardFooter>
           </Card>
         </GridItem>

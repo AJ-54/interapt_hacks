@@ -19,6 +19,7 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
+import {useEffect,useState} from "react";
 
 import { bugs, website, server } from "variables/general.js";
 
@@ -29,11 +30,84 @@ import {
 } from "variables/charts.js";
 
 import styles from "assets/jss/material-dashboard-react/views/dashboardStyle.js";
-
+import axios from "http/axios"
 const useStyles = makeStyles(styles);
 
 export default function Dashboard() {
+  const [cardData, setcardData] = useState(null);
+  const [nextrotationdata, setnextrotationdata] = useState([[]]);
+  const [plotData1, setplotData1] = useState({});
+  const [plotData2, setplotData2] = useState({});
+  const [plotData3, setplotData3] = useState({});
+  
   const classes = useStyles();
+  useEffect(()=>{
+    (async()=>{
+       let result = await axios.get("/core/dashboard_data");
+       console.log(result)
+       let data= result.data;
+       setcardData(data);
+       result = await axios.get("/core/diversity");
+       data=result.data;
+       setplotData1(prev=>(
+         {
+           ...prev,
+                ...{
+          labels: [
+            "Male",
+            "Female",
+            "Others"
+          ],
+          series: [[data.total.male,data.gender.male.colored,data.gender.male.not_colored],[data.total.female,data.gender.female.colored,data.gender.female.not_colored],[data.total.other,data.gender.other.colored,data.gender.other.not_colored]],
+       },
+         }
+       ));
+       result = await axios.get("/core/resource_ratio");
+       data= result.data;
+       setplotData2(prev=>(
+         {
+           ...prev,
+                ...{
+          labels: [
+            "PM",
+            "UX",
+            "Engr"
+          ],
+          series: [[data.pms,data.uxs,data.Engr]],
+       },
+         }
+       ));
+       
+       result = await axios.get("/core/engr_ratio");
+        data=result.data;
+       setplotData3(prev=>(
+         {
+           ...prev,
+          ...{
+          labels: [
+            "Junior",
+            "Mid",
+            "Senior"
+          ],
+          series: [[data.junior,data.senior,data.mid]],
+       },
+         }
+       ));
+       result = await axios.get("/core/next_rotation_resources");
+       data=result.data;
+       console.log(data)
+       setnextrotationdata(prev=>{
+         let give=data.map((el,id)=>{
+              let arr=[id+1];
+              arr.push(el.resource);
+              arr.push(el.product);
+              arr.push(el.days)
+              return arr;
+         })
+         return give;
+       });    
+    })()
+  },[])
   return (
     <div>
       <GridContainer>
@@ -44,7 +118,7 @@ export default function Dashboard() {
                 <Icon>content_copy</Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Ongoing Products</p>
-              <h3 className={classes.cardTitle}>26</h3>
+  <h3 className={classes.cardTitle}>{cardData?.active_products}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -61,7 +135,7 @@ export default function Dashboard() {
                 <Store />
               </CardIcon>
               <p className={classes.cardCategory}>Resources Count</p>
-              <h3 className={classes.cardTitle}>88</h3>
+              <h3 className={classes.cardTitle}>{cardData?.resources}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -78,7 +152,7 @@ export default function Dashboard() {
                 <Icon>info_outline</Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Vendors</p>
-              <h3 className={classes.cardTitle}>75</h3>
+              <h3 className={classes.cardTitle}>{cardData?.contractors}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -95,7 +169,7 @@ export default function Dashboard() {
                 <Accessibility />
               </CardIcon>
               <p className={classes.cardCategory}>Completed Products</p>
-              <h3 className={classes.cardTitle}>23</h3>
+              <h3 className={classes.cardTitle}>{cardData?.completed_products}</h3>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
@@ -112,8 +186,8 @@ export default function Dashboard() {
             <CardHeader color="success">
               <ChartistGraph
                 className="ct-chart"
-                data={dailySalesChart.data}
-                type="Line"
+                data={plotData1}
+                type="Bar"
                 options={dailySalesChart.options}
                 listener={dailySalesChart.animation}
               />
@@ -129,7 +203,7 @@ export default function Dashboard() {
             <CardHeader color="warning">
               <ChartistGraph
                 className="ct-chart"
-                data={emailsSubscriptionChart.data}
+                data={plotData2}
                 type="Bar"
                 options={emailsSubscriptionChart.options}
                 responsiveOptions={emailsSubscriptionChart.responsiveOptions}
@@ -147,7 +221,7 @@ export default function Dashboard() {
             <CardHeader color="danger">
               <ChartistGraph
                 className="ct-chart"
-                data={completedTasksChart.data}
+                data={plotData3}
                 type="Line"
                 options={completedTasksChart.options}
                 listener={completedTasksChart.animation}
@@ -217,12 +291,7 @@ export default function Dashboard() {
               <Table
                 tableHeaderColor="warning"
                 tableHead={["ID", "Resource", "Product", "Days"]}
-                tableData={[
-                  ["1", "Dakota Rice", "$36,738", "Niger"],
-                  ["2", "Minerva Hooper", "$23,789", "Curaçao"],
-                  ["3", "Sage Rodriguez", "$56,142", "Netherlands"],
-                  ["4", "Philip Chaney", "$38,735", "Korea, South"],
-                ]}
+                tableData={nextrotationdata}
               />
             </CardBody>
           </Card>

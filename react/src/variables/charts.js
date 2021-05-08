@@ -25,7 +25,7 @@ const dailySalesChart = {
       tension: 0,
     }),
     low: 0,
-    high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+    high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
     chartPadding: {
       top: 0,
       right: 0,
@@ -69,30 +69,13 @@ const dailySalesChart = {
 // // // Email Subscriptions
 // #############################
 
-const emailsSubscriptionChart = {
-  data: {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-    series: [[542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895]],
-  },
+const emailsSubscriptionChart  =({
   options: {
     axisX: {
       showGrid: false,
     },
     low: 0,
-    high: 1000,
+    high: 50,
     chartPadding: {
       top: 0,
       right: 5,
@@ -128,7 +111,7 @@ const emailsSubscriptionChart = {
       }
     },
   },
-};
+});
 
 // ##############################
 // // // Completed Tasks
@@ -144,7 +127,7 @@ const completedTasksChart = {
       tension: 0,
     }),
     low: 0,
-    high: 1000, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
+    high: 100, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
     chartPadding: {
       top: 0,
       right: 0,
