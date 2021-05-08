@@ -2,16 +2,15 @@ import axios from "axios";
 export const env = "dev";
 const baseURL =
   env == "dev"
-    ? "http://localhost:8000"
+    ? "http://a8022c8c0e29.ngrok.io/"
     : "https://interview-tracker-iitg.herokuapp.com";
 
 const axiosInstance = axios.create({
   baseURL: baseURL,
-  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
-    Accept: "application/json"
+    Accept: "application/json",
   },
 });
 
-export default axiosInstance;
+export default axiosInstance
