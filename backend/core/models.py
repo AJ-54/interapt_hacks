@@ -6,6 +6,12 @@ from typing import (
 from datetime import datetime
 # Create your models here.
 
+class LocationChoices(models.TextChoices):
+        AZ="AZ"
+        IL="IL"
+        TX="TX"
+        EMPTY=""
+
 class Skill(models.Model):
     title:str=models.CharField(max_length=255)
     description:Optional[str]=models.TextField(blank=True,null=True)
@@ -34,7 +40,7 @@ class Resource(models.Model):
     vendor=models.ForeignKey(Vendor,related_name="resources",on_delete=models.CASCADE,null=True)
     start_date:datetime.date=models.DateField()
     current_end_date:datetime.date=models.DateField()
-    location=models.TextField(blank=True,null=True)
+    location=models.CharField(max_length=100,choices=LocationChoices.choices,default="")
     is_color=models.BooleanField(blank=True,null=True)
     gender=models.CharField(choices=GenderChoices.choices,max_length=200)
     role=models.CharField(choices=RoleChoices.choices,max_length=200)
@@ -52,9 +58,9 @@ class Resource(models.Model):
 
 def get_default_requirements():
     return {
-        "Senior":0,
-        "Mid":0,
-        "Junior":0
+        "S":0,
+        "M":0,
+        "J":0
     }
 
 def get_default_positions():
@@ -73,7 +79,7 @@ class Product(models.Model):
     product_description:Optional[str]=models.TextField(blank=True,null=True)
     start_date:datetime.date = models.DateField(blank=False)
     end_date:Optional[datetime.date]=models.DateField(blank=True,null=True)
-    location:Optional[str]=models.TextField(blank=True,null=True)
+    location=models.CharField(max_length=100,choices=LocationChoices.choices,default="")
     resources=models.ManyToManyField(Resource,related_name="products",through="core.ProductResourceInfo")
     requirements=models.JSONField(default=get_default_requirements)
 

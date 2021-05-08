@@ -9,6 +9,8 @@ pillow = "*"
 django-redis = "*"
 celery = "*"
 django-rest-framework = "*"
+django-filter = "*"
+pandas = "*"
 
 [dev-packages]
 
