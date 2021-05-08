@@ -11,6 +11,7 @@ celery = "*"
 django-rest-framework = "*"
 django-filter = "*"
 pandas = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

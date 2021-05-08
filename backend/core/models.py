@@ -93,13 +93,15 @@ class Product(models.Model):
 class ProductResourceInfo(models.Model):
     product=models.ForeignKey(Product,related_name="resources_through",on_delete=models.CASCADE)
     resource=models.ForeignKey(Resource,related_name="products_through",on_delete=models.CASCADE)
-    start_date:datetime.date=models.DateField(auto_now=True)
+    start_date:datetime.date=models.DateField()
     end_date:datetime.date=models.DateField(null=True)
-    positions=models.JSONField(default=get_default_positions)
+    positions=models.JSONField(default=get_default_positions, null=True)
     is_employee:bool=models.BooleanField(default=True)
 
     def save(self,*args,**kwargs):
         if not self.id:
+            if self.start_date is None:
+                self.start_date = datetime.now().date()
             if self.resource.vendor is not None:
                 self.is_employee=False
         return super(ProductResourceInfo,self).save(*args,**kwargs)
