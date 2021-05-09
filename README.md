@@ -1,6 +1,6 @@
 # Interapt_hacks
 
-We hosted our site at voldemort.wtf
+We hosted our site at http://vodemort.wtf/
 
 ** The site may go down due to limited azure subscription
 
