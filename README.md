@@ -1,4 +1,9 @@
-# interapt_hacks
+# Interapt_hacks
+
+We hosted our site at voldemort.wtf
+
+** The site may go down due to limited azure subscription
+
 ## Tech Stack
 
 ### Frontend
@@ -12,6 +17,7 @@
 2. Django rest framework
 3. Postgres
 4. Celery
+5. Azure
 
 
 ## Features
