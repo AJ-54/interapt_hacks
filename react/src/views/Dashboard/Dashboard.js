@@ -99,7 +99,8 @@ export default function Dashboard() {
        console.log(data)
        setnextrotationdata(prev=>{
          let give=data.map((el,id)=>{
-              let arr=[id+1];
+              let arr=[];
+              arr.push(el.id);
               arr.push(el.resource);
               arr.push(el.product);
               arr.push(el.days)

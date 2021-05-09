@@ -1,0 +1,110 @@
+version: "3.8"
+
+services:
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    build: ./proxy
+    ports:
+      - 80:80
+    volumes:
+      - static_volume:/interapt/static
+      - media_volume:/interapt/media
+    depends_on:
+      - backend
+
+  db:
+    restart: unless-stopped
+    image: postgres
+    environment:
+      - POSTGRES_DB=interapt
+      - POSTGRES_USER=interapt
+      - POSTGRES_PASSWORD=interapt
+    volumes: 
+        - pgdata:/var/lib/postgresql/data
+
+  redis :
+    restart: unless-stopped
+    image : redis:alpine
+    container_name: cache
+    expose :
+      - 6379
+
+  backend:
+    restart: unless-stopped
+    build: .
+    container_name: interapt-backend
+    image : habbit-server/backend
+    command: sh -c "/wait && /migrate_and_run"
+    volumes:
+      - .:/interapt
+      - static_volume:/interapt/static
+      - media_volume:/interapt/media
+    expose:
+      - "8000"
+    ports :
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
+      - HOST=db
+      - WAIT_HOSTS=db:5432,cache:6379
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+
+  celery-beat:
+    restart: unless-stopped
+    build:
+      context: .
+    command: sh -c "/wait && /celery_beat"
+    volumes:
+      - .:/interapt
+    environment:
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
+      - HOST=db
+      - WAIT_HOSTS=backend:8000
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+    depends_on:
+      - db
+      - redis
+
+  celery_worker:
+    restart: unless-stopped
+    build:
+      context: .
+    command: sh -c "/wait && /celery_worker"
+    volumes:
+      - .:/interapt
+    environment:
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
+      - HOST=db
+      - WAIT_HOSTS=backend:8000
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+    depends_on:
+      - db
+      - redis
+
+  celery-flower:
+    restart: unless-stopped
+    image: mher/flower
+    ports:
+      - 5555:5555
+    environment:
+      - CELERY_BROKER_URL=redis://cache:6379
+    depends_on:
+      - redis
+  
+volumes:
+ pgdata:
+ static_volume:
+ media_volume:

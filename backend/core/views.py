@@ -132,7 +132,7 @@ class GetProductResourcePositionsView(generics.GenericAPIView):
             else :
                 check={}
                 check[k]=1
-                data[k]==self.serializer_class(resources.filter(positions__contains=check),many=True).data
+                data[k]=self.serializer_class(resources.filter(positions__contains=check),many=True).data
 
         return Response(data,status=status.HTTP_200_OK)
 
@@ -217,9 +217,14 @@ class AllocateResources(generics.CreateAPIView):
         print(serializer)
         if serializer.is_valid():
             instance =serializer.save()
-            allocate_resources(instance)
+            is_vaccancy={}
+            allocate_resources(instance,is_vaccancy)
             data=ProductSerializer(instance,context={"request":request}).data
-            return Response(data,status=status.HTTP_200_OK)
+            return Response({
+                "resources":data.get("resources"),
+                "is_vaccancy":is_vaccancy
+            },status=status.HTTP_200_OK)
+        print(serializer.errors)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 

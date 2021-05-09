@@ -22,11 +22,11 @@ def send_mail(subject_template_name, email_template_name, context, from_email, t
 
     email_message.send()
 
-def allocate_resources(product):
+def allocate_resources(product,is_vacancy):
     is_vacancy={
-        "Senior":False,
-        "Junior":False,
-        "Mid":False
+        "Senior":0,
+        "Junior":0,
+        "Mid":0
     }
 
     if product.end_date is not None :
@@ -41,11 +41,11 @@ def allocate_resources(product):
                 products_through__end_date=None,
             )
 
-            can_take=min(product.requirements[k],available_resources.count())
+            can_take=min(int(product.requirements[k]),available_resources.count())
             print(can_take)
-            diff=can_take-product.requirements[k]
+            diff=can_take-int(product.requirements[k])
             if diff<0 :
-                is_vacancy[k]=True
+                is_vacancy[k]=-1*diff
             for i in range(can_take):
                 print("i",i)
                 product.resources.add(available_resources[i])
@@ -60,10 +60,10 @@ def allocate_resources(product):
                 products__end_date=None
             )
 
-            can_take=min(product.requirements[k],available_resources.count())
-            diff=can_take-product.requirements[k]
+            can_take=min(int(product.requirements[k]),available_resources.count())
+            diff=can_take-int(product.requirements[k])
             if diff<0 :
-                is_vacancy[k]=True
+                is_vacancy[k]=-1*diff
             for i in range(can_take):
                 product.resources.add(available_resources[i])
 
