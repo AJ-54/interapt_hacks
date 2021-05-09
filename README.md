@@ -1,12 +1,12 @@
 # interapt_hacks
 ## Tech Stack
 
-###Frontend
+### Frontend
 1. React js
 2. MAterial UI
 3. Netlify
 
-###Backend
+### Backend
 
 1. Django
 2. Django rest framework
@@ -14,7 +14,7 @@
 4. Celery
 
 
-##Features
+## Features
 
 1. Allocate Resources on new projects optimally
 2. Identify Resources who are ready for next rotation
@@ -24,17 +24,17 @@
 6. Skillset of a Resource
 7. Diversity
 
-##Dev Set up
+## Dev Set up
 
 run git clone https://github.com/AJ-54/interapt_hacks.git
 
-##Backend set up
+## Backend set up
 
 run cd backend
 run pipenv install
 run python manage.py runserver
 
-##Frontend set up
+## Frontend set up
 
 run cd react
 run npm install
