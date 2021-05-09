@@ -2,7 +2,8 @@
 
 We hosted our site at http://vodemort.wtf/
 
-** The site may go down due to limited azure subscription
+There is a spelling mistake in above url
+Actual url is http://voldemort.wtf
 
 
 
