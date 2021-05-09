@@ -3,7 +3,7 @@
 
 ### Frontend
 1. React js
-2. MAterial UI
+2. Material UI
 3. Netlify
 
 ### Backend
@@ -29,16 +29,16 @@
 git clone https://github.com/AJ-54/interapt_hacks.git
 
 ### Backend set up
-
+```
 cd backend
 pipenv install
 python manage.py runserver
-
+```
 ## Frontend set up
-
+```
 cd react
 npm install
 npm start
-
+```
 
 
