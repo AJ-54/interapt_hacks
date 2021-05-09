@@ -1,2 +1,2 @@
 #!/bin/sh
-celery -A habbit beat -l info
+celery -A Interapt beat -l info

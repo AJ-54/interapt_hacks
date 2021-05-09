@@ -132,7 +132,7 @@ class GetProductResourcePositionsView(generics.GenericAPIView):
             else :
                 check={}
                 check[k]=1
-                data[k]==self.serializer_class(resources.filter(positions__contains=check),many=True).data
+                data[k]=self.serializer_class(resources.filter(positions__contains=check),many=True).data
 
         return Response(data,status=status.HTTP_200_OK)
 

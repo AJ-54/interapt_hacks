@@ -35,7 +35,7 @@ services:
     build: .
     container_name: interapt-backend
     image : habbit-server/backend
-    command: sh -c "/interapt/scripts/wait  && /interapt/scripts/migrate_and_run"
+    command: sh -c "/wait && /migrate_and_run"
     volumes:
       - .:/interapt
       - static_volume:/interapt/static
@@ -47,8 +47,6 @@ services:
     depends_on:
       - db
       - redis
-    env_file:
-      - .env
     environment:
       - REDIS_HOST=cache
       - REDIS_PORT=6379
@@ -62,7 +60,7 @@ services:
     restart: unless-stopped
     build:
       context: .
-    command: sh -c "scripts/wait && scripts/celery_beat"
+    command: sh -c "/wait && /celery_beat"
     volumes:
       - .:/interapt
     environment:
@@ -81,7 +79,7 @@ services:
     restart: unless-stopped
     build:
       context: .
-    command: sh -c "scripts/wait && scripts/celery_worker"
+    command: sh -c "/wait && /celery_worker"
     volumes:
       - .:/interapt
     environment:

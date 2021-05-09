@@ -13,7 +13,7 @@ django-filter = "*"
 pandas = "*"
 django-cors-headers = "*"
 psycopg2 = "*"
-
+gunicorn="*"
 [dev-packages]
 
 [requires]

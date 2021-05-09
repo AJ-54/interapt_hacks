@@ -1,2 +1,2 @@
 #!/bin/sh
-celery -A habbit worker -l info
+celery -A Interapt worker -l info

@@ -24,12 +24,19 @@ RUN pipenv install  --deploy --system --ignore-pipfile
 
 WORKDIR /interapt
 
-# ENV WAIT_VERSION 2.7.2
+ENV WAIT_VERSION 2.7.2
 # ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait scripts/wait
 
 # always copy files after installing packages
 # docker will cache the packages hence better build time
 COPY . /interapt
 
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait scripts/wait
-RUN chmod +x scripts/*
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
+RUN chmod +x /wait
+ADD scripts/migrate_and_run /migrate_and_run
+ADD scripts/celery_worker /celery_worker
+ADD scripts/celery_beat /celery_beat
+RUN chmod +x /migrate_and_run
+RUN chmod +x /celery_worker
+RUN chmod +x /celery_beat
+
