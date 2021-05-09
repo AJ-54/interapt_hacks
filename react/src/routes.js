@@ -11,6 +11,8 @@ import ContractorTableList from "views/TableList/ContractorTableList.js";
 
 import Maps from "views/Maps/Maps.js";
 
+import Product from "views/Product/Product"
+
 const dashboardRoutes = [
   {
     path: "/dashboard",
@@ -45,6 +47,13 @@ const dashboardRoutes = [
     name: "Resource",
     icon: "content_paste",
     component: ResourceTableList,
+    layout: "/admin",
+  },
+  {
+    path: "/product",
+    name: "Product",
+    icon: "content_paste",
+    component: Product,
     layout: "/admin",
   },
   {

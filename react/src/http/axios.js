@@ -2,7 +2,7 @@ import axios from "axios";
 export const env = "dev";
 const baseURL =
   env == "dev"
-    ? "http://a8022c8c0e29.ngrok.io/"
+    ? "http://13.77.159.131"
     : "https://interview-tracker-iitg.herokuapp.com";
 
 const axiosInstance = axios.create({
