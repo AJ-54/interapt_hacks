@@ -26,19 +26,19 @@
 
 ## Dev Set up
 
-run git clone https://github.com/AJ-54/interapt_hacks.git
+git clone https://github.com/AJ-54/interapt_hacks.git
 
-## Backend set up
+### Backend set up
 
-run cd backend
-run pipenv install
-run python manage.py runserver
+cd backend
+pipenv install
+python manage.py runserver
 
 ## Frontend set up
 
-run cd react
-run npm install
-run npm start
+cd react
+npm install
+npm start
 
 
 
