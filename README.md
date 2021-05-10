@@ -1,9 +1,6 @@
 # Interapt_hacks
 
-We hosted our site at http://vodemort.wtf/
-
-There is a spelling mistake in above url
-Actual url is http://voldemort.wtf
+We hosted our site at http://voldemort.wtf/
 
 
 
