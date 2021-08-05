@@ -1,7 +1,5 @@
 # Interapt_hacks
 
-We hosted our site at http://voldemort.wtf/
-
 
 
 ## Tech Stack
